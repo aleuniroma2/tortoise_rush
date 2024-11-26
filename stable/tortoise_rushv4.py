@@ -30,13 +30,16 @@ def main(stdscr, num_tortoises):
     # Assign unique names and positions for the tortoises
     tortoises = [
         {
-            "name": NAMES[i % len(NAMES)] + f" {i+1}",  # Ensure unique names
+            "name": NAMES[i % len(NAMES)],  # Ensure unique names
             "x": 0,
             "y": 2 + i * 2,  # Start positions with spacing between tracks
-            "speed": random.uniform(0.1, 0.5),
-            #"speed": random.uniform(0.5, 1.5),
+            "speed": random.uniform(3.1, 3.5),
+#            "speed": random.uniform(0.1, 0.5),
             "acceleration": random.uniform(-0.05, 0.05),
             "color": random.randint(1, num_colors),
+            "finished": False,  # Track if the tortoise has finished the race
+            "dispayed": False,
+            "numberedfinished": 0
         }
         for i in range(num_tortoises)
     ]
@@ -72,10 +75,10 @@ def main(stdscr, num_tortoises):
     # Define the finish line
     finish_line = width - 10  # Leave some space for visibility
 
-    winner = None
+    finished_tortoises = []
 
     # Step 4: Start the race
-    while not winner:
+    while len(finished_tortoises) < num_tortoises:
         # Clear the screen for the next frame
         stdscr.clear()
 
@@ -86,21 +89,35 @@ def main(stdscr, num_tortoises):
 
         # Update each tortoise
         for tortoise in tortoises:
+            if tortoise["finished"]:
+                y = tortoise["y"]
+                color_pair = curses.color_pair(tortoise["color"])
+                stdscr.addstr(y, 0, f"{tortoise['name']:<10}", color_pair)  # Print name
+                if tortoise["dispayed"] == False:
+                    stdscr.addstr(y, finish_line, f"{len(finished_tortoises) }" +" " + f"{tortoise['name']:<5}", curses.A_BOLD)  # Print position in white
+                    tortoise["dispayed"] = True
+                    tortoise["numberedfinished"] = len(finished_tortoises) 
+                else:
+                    stdscr.addstr(y, finish_line, f"{tortoise['numberedfinished']}" +" " + f"{tortoise['name']:<5}", curses.A_BOLD)
+                continue
+
             # Update speed with acceleration
             tortoise["speed"] = max(0.1, tortoise["speed"] + tortoise["acceleration"])
 
             # Randomly change acceleration
             if random.random() < 0.2:  # 20% chance per frame
-                #tortoise["acceleration"] = random.uniform(-0.05, 0.05)
                 tortoise["acceleration"] = random.uniform(-0.05, 0.02)
 
             # Update position
             tortoise["x"] += tortoise["speed"]
 
+
+
             # Check if the tortoise has reached the finish line
             if tortoise["x"] >= finish_line:
-                winner = tortoise
-                break
+                tortoise["finished"] = True
+                finished_tortoises.append(tortoise)
+                continue
 
             # Draw the tortoise and its name
             x = int(tortoise["x"])
@@ -116,22 +133,53 @@ def main(stdscr, num_tortoises):
         stdscr.refresh()
 
         # Control the frame rate
-        #time.sleep(0.05)
         time.sleep(0.075)
 
-    # Declare the winner
+    # Declare the results
     stdscr.clear()
-    if winner:
-        stdscr.addstr(
-            height // 2,
-            width // 2 - len(winner["name"]) - 10,
-            f"The winner is: {winner['name']}!",
-            curses.A_BOLD,
-        )
-    else:
-        stdscr.addstr(height // 2, width // 2 - 10, "Race interrupted!", curses.A_BOLD)
+    stdscr.addstr(height // 2 - len(finished_tortoises) // 2 - 6, width // 2 - 10, "Race Results:", curses.A_BOLD)
+
+    # Podium heights
+    podium_heights = [10, 7, 5]
+
+    # Draw podium
+    base_width = width // 8
+    spacing = 2  # Spacing between columns
+    center_x =8 + width // 2 - base_width - spacing  # Shift the podium to the left
+    base_y = height // 2 + max(podium_heights) // 2
+
+    # Define colors for the podium
+    GOLD = 3
+    SILVER = 7
+    BRONZE = 6
+
+    positions = [
+        {"label": "2°", "x_offset": -(base_width + spacing), "height": podium_heights[1], "color": SILVER, "name": finished_tortoises[1]['name'] if len(finished_tortoises) > 1 else ""},
+        {"label": "1°", "x_offset": 0, "height": podium_heights[0], "color": GOLD, "name": finished_tortoises[0]['name'] if len(finished_tortoises) > 0 else ""},
+        {"label": "3°", "x_offset": base_width + spacing, "height": podium_heights[2], "color": BRONZE, "name": finished_tortoises[2]['name'] if len(finished_tortoises) > 2 else ""},
+    ]
+
+    # Draw each podium column
+    for pos in positions:
+        col_x = center_x + pos["x_offset"]
+        col_y = base_y - pos["height"]
+
+        for row in range(pos["height"]):
+            for col in range(base_width):
+                stdscr.addch(col_y + row, col_x + col, " ", curses.color_pair(pos["color"]) | curses.A_REVERSE)
+
+        stdscr.addstr(col_y - 1, col_x + base_width // 2 - len(pos["label"]) // 2, pos["label"], curses.A_BOLD)
+        if pos["name"]:
+            stdscr.addstr(col_y - 2, col_x + base_width // 2 - len(pos["name"]) // 2, pos["name"], curses.A_BOLD)
+
+    # Title
+
+    # Display the rest of the results
+    for idx, tortoise in enumerate(finished_tortoises[3:]):
+        stdscr.addstr(base_y + idx + 1, width // 2 - 10, f"{idx + 4}. {tortoise['name']}", curses.A_BOLD)
+
     stdscr.refresh()
-    time.sleep(3)
+    time.sleep(4)
 
 # Command-line argument parsing
 if __name__ == "__main__":
@@ -145,4 +193,3 @@ if __name__ == "__main__":
         curses.wrapper(main, args.num_tortoises)
     except ValueError as e:
         print(str(e))
-
