@@ -75,6 +75,7 @@ def main(stdscr, num_tortoises):
     finish_line = width - 10  # Leave some space for visibility
 
     finished_tortoises = []
+    first_finish_time = None
 
     # Step 4: Start the race
     while len(finished_tortoises) < num_tortoises:
@@ -110,12 +111,12 @@ def main(stdscr, num_tortoises):
             # Update position
             tortoise["x"] += tortoise["speed"]
 
-
-
             # Check if the tortoise has reached the finish line
             if tortoise["x"] >= finish_line:
                 tortoise["finished"] = True
                 finished_tortoises.append(tortoise)
+                if first_finish_time is None:
+                    first_finish_time = time.time()
                 continue
 
             # Draw the tortoise and its name
@@ -128,11 +129,27 @@ def main(stdscr, num_tortoises):
             except curses.error:
                 pass  # Ignore out-of-bound errors
 
+        # Display the timeout timer
+        if first_finish_time:
+            elapsed_time = time.time() - first_finish_time
+            remaining_time = max(0, 60 - elapsed_time)
+            stdscr.addstr(0, width // 2 - 10, f"Time left: {remaining_time:.2f} seconds", curses.A_BOLD)
+
         # Refresh the screen to show updates
         stdscr.refresh()
 
         # Control the frame rate
         time.sleep(0.075)
+
+        # Check for timeout
+        if first_finish_time and time.time() - first_finish_time >= 60:
+            break
+
+    # Mark remaining tortoises as not finished
+    for tortoise in tortoises:
+        if not tortoise["finished"]:
+            tortoise["finished"] = True
+            finished_tortoises.append(tortoise)
 
     # Declare the results
     stdscr.clear()
@@ -180,7 +197,6 @@ def main(stdscr, num_tortoises):
     stdscr.refresh()
     stdscr.getch()
 
-
 # Command-line argument parsing
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tortoise race animation!")
@@ -188,7 +204,6 @@ if __name__ == "__main__":
         "--num_tortoises", type=int, default=5, help="Number of tortoises in the race (default: 5)"
     )
     args = parser.parse_args()
-
     try:
         curses.wrapper(main, args.num_tortoises)
     except ValueError as e:
