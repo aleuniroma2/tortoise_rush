@@ -1,5 +1,8 @@
 # 🐢 Tortoise Rush 🏁
 
+![prova](resources/Tortoise-Rush-Description.png)
+
+
 Welcome to **Tortoise Rush**, a simple yet thrilling Python game where you can bet on which tortoise will win a race! Who will emerge victorious in this test of slow and steady determination? Try your luck and see!
 
 ---
