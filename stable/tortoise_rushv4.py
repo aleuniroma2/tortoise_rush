@@ -33,9 +33,8 @@ def main(stdscr, num_tortoises):
             "name": NAMES[i % len(NAMES)],  # Ensure unique names
             "x": 0,
             "y": 2 + i * 2,  # Start positions with spacing between tracks
-            "speed": random.uniform(3.1, 3.5),
-#            "speed": random.uniform(0.1, 0.5),
-            "acceleration": random.uniform(-0.05, 0.05),
+            "speed": 0.1, #random.uniform(0.1, 0.2),
+            "acceleration": 0, #random.uniform(-0.05, 0.05),
             "color": random.randint(1, num_colors),
             "finished": False,  # Track if the tortoise has finished the race
             "dispayed": False,
@@ -102,11 +101,11 @@ def main(stdscr, num_tortoises):
                 continue
 
             # Update speed with acceleration
-            tortoise["speed"] = max(0.1, tortoise["speed"] + tortoise["acceleration"])
+            tortoise["speed"] = max(0, tortoise["speed"] + tortoise["acceleration"])
 
             # Randomly change acceleration
             if random.random() < 0.2:  # 20% chance per frame
-                tortoise["acceleration"] = random.uniform(-0.05, 0.02)
+                tortoise["acceleration"] = random.uniform(-0.05, 0.025)
 
             # Update position
             tortoise["x"] += tortoise["speed"]
@@ -179,7 +178,8 @@ def main(stdscr, num_tortoises):
         stdscr.addstr(base_y + idx + 1, width // 2 - 10, f"{idx + 4}. {tortoise['name']}", curses.A_BOLD)
 
     stdscr.refresh()
-    time.sleep(4)
+    stdscr.getch()
+
 
 # Command-line argument parsing
 if __name__ == "__main__":
