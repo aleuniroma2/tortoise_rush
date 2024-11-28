@@ -2,8 +2,8 @@
 
 ![prova](resources/Tortoise-Rush-Description.png)
 
-
-Welcome to **Tortoise Rush**, a simple yet thrilling Python game where you can bet on which tortoise will win a race! Who will emerge victorious in this test of slow and steady determination? Try your luck and see!
+You've landed on the **Tortoise Rush** repo, an open-source Python based game for your bash terminal. I encourage you to try the game and, most of all, contribute to the project with your ideas and new features.
+**Tortoise Rush** is a simple yet thrilling game where you can bet on which tortoise will win a race! Who will emerge victorious in this test of slow and steady determination? Try your luck and see!
 
 ---
 
@@ -14,10 +14,11 @@ Welcome to **Tortoise Rush**, a simple yet thrilling Python game where you can b
 
 2. Navigate to the project folder:
    ```bash
-    cd tortoise-rush
+   cd tortoise-rush
+   cd stable 
 3. Run the game: 
    ```bash
-    python tortoise_rush.py
+    python tortoise_rush.py --num_tortoises 15
 4. Place your bets on your favorite tortoise.
 5. Watch the race unfold and see if your pick wins!
 
@@ -36,6 +37,12 @@ Tortoise Rush is an open-source project, and we’d love your help to make it ev
 - **Improve visuals**: Have an eye for design? Help us make the tortoise race even more engaging!
 - **Add new mechanics**: Introduce new twists to the race or betting systems.
 - **Bug fixes**: Found a bug? Submit an issue or fix it yourself!
+  
+---
+
+## 🐢Tortoise Community
+If you are not confident in your Python game, **open an issue** and suggest a feature you'd like to see in the game. **Another tortoise-lover user might see it and develop it for you!!!**
+
 
 ### Stable and Unstable Releases
 - **Stable releases**: Fully tested and bug-free. Perfect for casual players!
@@ -51,7 +58,7 @@ When submitting new features or ideas, consider starting them in the **unstable*
    git checkout -b feature/your-feature-name
 2. Commit your changes:
    ```bash
-      git commit -m "Add: Description of your feature"
+   git commit -m "Add: Description of your feature"
 3. Push your branch to your fork:
    ```bash
     git push origin feature/your-feature-name
